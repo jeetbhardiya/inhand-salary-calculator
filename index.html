@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>In-Hand Salary Calculator</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0f;
+  --surface: #111118;
+  --card: #16161f;
+  --border: #252535;
+  --accent: #6ee7b7;
+  --accent2: #818cf8;
+  --accent3: #fb923c;
+  --warn: #f87171;
+  --text: #e8e8f0;
+  --muted: #6b6b85;
+  --dimmed: #3a3a50;
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { font-size: 16px; -webkit-text-size-adjust: 100%; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Mono', monospace;
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: -20%; left: -10%;
+  width: 70vw; height: 70vw;
+  background: radial-gradient(circle, rgba(110,231,183,0.04) 0%, transparent 65%);
+  pointer-events: none; z-index: 0;
+}
+body::after {
+  content: '';
+  position: fixed;
+  bottom: -20%; right: -10%;
+  width: 55vw; height: 55vw;
+  background: radial-gradient(circle, rgba(129,140,248,0.05) 0%, transparent 65%);
+  pointer-events: none; z-index: 0;
+}
+
+/* Sticky bar */
+.sticky-bar {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  background: rgba(10,10,15,0.94);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 16px;
+  align-items: center;
+  justify-content: space-between;
+  transform: translateY(-110%);
+  transition: transform 0.3s cubic-bezier(.4,0,.2,1);
+}
+.sticky-bar.visible { transform: translateY(0); }
+.sticky-bar-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+.sticky-bar-value {
+  font-family: 'Syne', sans-serif; font-size: 1.25rem; font-weight: 800;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+
+/* Container */
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 36px 16px 80px;
+  position: relative; z-index: 1;
+}
+
+header { margin-bottom: 28px; animation: fadeDown 0.5s ease both; }
+
+.badge {
+  display: inline-block;
+  background: rgba(110,231,183,0.1);
+  border: 1px solid rgba(110,231,183,0.25);
+  color: var(--accent);
+  font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 4px 12px; border-radius: 100px; margin-bottom: 10px;
+}
+
+h1 {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(1.65rem, 6vw, 3rem);
+  font-weight: 800; line-height: 1.1; letter-spacing: -0.02em;
+}
+h1 span {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.subtitle { color: var(--muted); font-size: 12px; margin-top: 8px; line-height: 1.7; }
+
+/* Layout */
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+/* Cards */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px;
+  animation: fadeUp 0.45s ease both;
+}
+.card + .card { margin-top: 16px; }
+
+.card-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 18px;
+  display: flex; align-items: center; gap: 8px;
+}
+.card-title::before {
+  content: ''; width: 6px; height: 6px;
+  border-radius: 50%; background: var(--accent); flex-shrink: 0;
+}
+
+/* Fields */
+.field { margin-bottom: 14px; }
+
+label {
+  display: block;
+  font-size: 10px; font-weight: 500;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 7px;
+}
+
+.input-wrap { position: relative; display: flex; align-items: center; }
+.input-prefix {
+  position: absolute; left: 13px;
+  font-size: 13px; color: var(--dimmed); pointer-events: none;
+}
+
+input[type="number"] {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 13px 13px 13px 28px;
+  font-family: 'DM Mono', monospace;
+  font-size: 15px; /* >=16px prevents iOS zoom, 15px fine with maximum-scale=1 */
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  -moz-appearance: textfield;
+  -webkit-appearance: none; appearance: none;
+}
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+input[type="number"]:focus {
+  border-color: var(--accent2);
+  box-shadow: 0 0 0 3px rgba(129,140,248,0.12);
+}
+
+/* Toggles */
+.toggle-field {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  -webkit-user-select: none; user-select: none;
+  min-height: 54px;
+}
+.toggle-field:active { background: rgba(255,255,255,0.03); }
+.toggle-field.active { border-color: var(--accent); }
+
+.toggle-label { font-size: 13px; color: var(--text); }
+.toggle-sub { font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+.toggle { position: relative; width: 42px; height: 24px; flex-shrink: 0; }
+.toggle input { opacity: 0; width: 0; height: 0; }
+.slider {
+  position: absolute; inset: 0;
+  background: var(--dimmed); border-radius: 100px;
+  transition: 0.25s; cursor: pointer;
+}
+.slider::before {
+  content: '';
+  position: absolute;
+  height: 18px; width: 18px;
+  left: 3px; top: 3px;
+  background: white; border-radius: 50%;
+  transition: 0.25s;
+}
+.toggle input:checked + .slider { background: var(--accent); }
+.toggle input:checked + .slider::before { transform: translateX(18px); }
+
+.cond-field {
+  overflow: hidden; max-height: 0; opacity: 0;
+  transition: max-height 0.3s ease, opacity 0.25s ease;
+}
+.cond-field.show { max-height: 160px; opacity: 1; }
+
+/* Regime */
+.regime-tabs { display: flex; gap: 8px; margin-bottom: 14px; }
+.regime-tab {
+  flex: 1; padding: 10px 6px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 8px; cursor: pointer;
+  text-align: center; font-family: 'DM Mono', monospace;
+  font-size: 12px; color: var(--muted);
+  transition: all 0.2s; line-height: 1.4; min-height: 46px;
+  -webkit-user-select: none; user-select: none;
+}
+.regime-tab.active {
+  background: rgba(129,140,248,0.12);
+  border-color: var(--accent2); color: var(--accent2); font-weight: 500;
+}
+.regime-note {
+  background: rgba(129,140,248,0.07);
+  border: 1px solid rgba(129,140,248,0.15);
+  border-radius: 8px; padding: 10px 12px;
+  font-size: 11px; color: var(--accent2);
+  margin-bottom: 14px; line-height: 1.65;
+}
+
+/* Chip */
+.chip {
+  display: inline-block;
+  background: rgba(251,146,60,0.1); border: 1px solid rgba(251,146,60,0.2);
+  color: var(--accent3); font-size: 9px; padding: 2px 7px;
+  border-radius: 100px; margin-left: 5px; vertical-align: middle;
+}
+
+/* Deduction rows */
+.d-row {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+  font-size: 12px; gap: 8px;
+}
+.d-row:last-child { border-bottom: none; }
+.d-name { color: var(--muted); flex: 1; }
+.d-amt { font-weight: 500; white-space: nowrap; }
+.d-amt.r { color: var(--warn); } .d-amt.g { color: var(--accent); } .d-amt.b { color: var(--accent2); }
+
+/* PF summary */
+.pf-box {
+  background: rgba(110,231,183,0.06);
+  border: 1px solid rgba(110,231,183,0.15);
+  border-radius: 10px; padding: 10px 12px;
+  margin-top: 4px; margin-bottom: 2px;
+}
+.pf-row { display: flex; justify-content: space-between; font-size: 12px; padding: 3px 0; }
+.pf-row.tot { border-top: 1px solid rgba(255,255,255,0.07); margin-top: 5px; padding-top: 7px; font-weight: 600; }
+
+/* Result card */
+.result-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; overflow: hidden;
+  animation: fadeUp 0.45s ease 0.1s both;
+  grid-column: 1 / -1;
+}
+
+.res-header {
+  background: linear-gradient(135deg, rgba(110,231,183,0.08), rgba(129,140,248,0.08));
+  border-bottom: 1px solid var(--border);
+  padding: 18px 20px;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+}
+.res-header-title {
+  font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);
+}
+.hero-wrap { text-align: right; flex-shrink: 0; }
+.hero-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 3px; }
+.hero-val {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(1.4rem, 4.5vw, 2.2rem);
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  line-height: 1.1;
+}
+
+/* Stats strip */
+.stats-strip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-bottom: 1px solid var(--border);
+}
+.stat {
+  padding: 13px 16px;
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.stat:nth-child(3n) { border-right: none; }
+.stat-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+.stat-val { font-family: 'Syne', sans-serif; font-size: 0.95rem; font-weight: 700; }
+.stat-val.neg { color: var(--warn); }
+.stat-val.pos { color: var(--accent); }
+.stat-val.neu { color: var(--accent2); }
+
+/* Waterfall */
+.wf-section { padding: 18px 20px; border-top: 1px solid var(--border); }
+.sec-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px; }
+
+.wf-row {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+  font-size: 12px; gap: 12px;
+}
+.wf-row:last-child { border-bottom: none; }
+.wf-name { color: var(--muted); flex: 1; line-height: 1.5; }
+.wf-name small { display: block; font-size: 10px; color: var(--dimmed); margin-top: 2px; }
+.wf-amt { font-weight: 500; white-space: nowrap; flex-shrink: 0; }
+.wf-amt.g { color: var(--accent); } .wf-amt.r { color: var(--warn); }
+
+.total-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 0 0;
+  border-top: 1px solid var(--border); margin-top: 6px;
+  font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px;
+}
+.meal-sep-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 8px 0 0; font-size: 13px; color: var(--accent2);
+}
+
+/* Annual */
+.ann-section { padding: 18px 20px; border-top: 1px solid var(--border); }
+.ann-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  border: 1px solid var(--border); border-radius: 10px;
+  overflow: hidden; background: rgba(255,255,255,0.015);
+}
+.ann-item {
+  padding: 12px 14px;
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.ann-item:nth-child(3n) { border-right: none; }
+.ann-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+.ann-val { font-family: 'Syne', sans-serif; font-size: 0.9rem; font-weight: 700; }
+.ann-val.pos { color: var(--accent); } .ann-val.neg { color: var(--warn); } .ann-val.neu { color: var(--accent2); }
+
+/* Tax note */
+.tax-note { padding: 12px 20px; border-top: 1px solid var(--border); font-size: 11px; color: var(--dimmed); line-height: 1.7; }
+
+/* Empty state */
+.empty { padding: 40px 20px; text-align: center; color: var(--dimmed); font-size: 12px; }
+.empty .ico { font-size: 28px; margin-bottom: 10px; opacity: 0.4; }
+
+/* Animations */
+@keyframes fadeDown { from { opacity:0; transform:translateY(-16px); } to { opacity:1; transform:translateY(0); } }
+@keyframes fadeUp   { from { opacity:0; transform:translateY(14px);  } to { opacity:1; transform:translateY(0); } }
+.pulse { animation: pg 0.35s ease; }
+@keyframes pg { 0%{opacity:1} 50%{opacity:0.4} 100%{opacity:1} }
+
+/* ── MOBILE ── */
+@media (max-width: 640px) {
+  .sticky-bar { display: flex; }
+  .container { padding: 16px 12px 100px; }
+  header { margin-bottom: 20px; }
+
+  .layout {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  /* order: inputs, pf/assumptions, results */
+  .layout > .col-left  { order: 1; }
+  .layout > .col-right { order: 2; }
+  .result-card         { order: 3; grid-column: 1; margin-top: 14px; }
+
+  .card { border-radius: 12px; padding: 16px; }
+  .card + .card { margin-top: 10px; }
+  .col-right .card:first-child { margin-top: 10px; }
+
+  /* 2-col stats on mobile */
+  .stats-strip { grid-template-columns: repeat(2, 1fr); }
+  .stat:nth-child(3n) { border-right: 1px solid var(--border); }
+  .stat:nth-child(2n) { border-right: none; }
+
+  /* 2-col annual on mobile */
+  .ann-grid { grid-template-columns: repeat(2, 1fr); }
+  .ann-item:nth-child(3n) { border-right: 1px solid var(--border); }
+  .ann-item:nth-child(2n) { border-right: none; }
+
+  /* Result header stacks on very small screens */
+  .res-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .hero-wrap { text-align: left; }
+
+  .wf-section  { padding: 14px 14px; }
+  .ann-section { padding: 14px 14px; }
+  .tax-note    { padding: 12px 14px; }
+}
+
+/* ── TABLET ── */
+@media (min-width: 641px) and (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  .result-card { grid-column: 1; }
+  .stats-strip { grid-template-columns: repeat(3, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<!-- Sticky in-hand bar (shows on mobile when results are below fold) -->
+<div class="sticky-bar" id="stickyBar">
+  <div class="sticky-bar-label">Monthly In-Hand</div>
+  <div class="sticky-bar-value" id="stickyVal">—</div>
+</div>
+
+<div class="container">
+  <header>
+    <div class="badge">&#127470;&#127475; India &middot; FY 2026&ndash;27</div>
+    <h1>In-Hand Salary<br><span>Calculator</span></h1>
+    <p class="subtitle">CTC &rarr; Take-Home after TDS, PF, PT, Variable &amp; Meal Card</p>
+  </header>
+
+  <div class="layout">
+
+    <!-- LEFT: CTC Details + Tax Regime -->
+    <div class="col-left">
+      <div class="card">
+        <div class="card-title">CTC Details</div>
+
+        <div class="field">
+          <label>Annual CTC</label>
+          <div class="input-wrap">
+            <span class="input-prefix">&#8377;</span>
+            <input type="number" id="ctc" placeholder="e.g. 1200000" inputmode="numeric" oninput="calc()">
+          </div>
+        </div>
+
+        <div class="toggle-field" id="varRow">
+          <div>
+            <div class="toggle-label">Variable Component</div>
+            <div class="toggle-sub">Annual variable pay in CTC</div>
+          </div>
+          <label class="toggle" onclick="event.stopPropagation()">
+            <input type="checkbox" id="varChk">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="cond-field" id="varField">
+          <div class="field" style="padding-top:6px;">
+            <label>Variable Amount (Annual)</label>
+            <div class="input-wrap">
+              <span class="input-prefix">&#8377;</span>
+              <input type="number" id="variable" placeholder="e.g. 120000" inputmode="numeric" oninput="calc()">
+            </div>
+          </div>
+        </div>
+
+        <div class="toggle-field" id="mealRow">
+          <div>
+            <div class="toggle-label">Meal Card</div>
+            <div class="toggle-sub">Sodexo/vouchers &mdash; exempt up to &#8377;1L/yr</div>
+          </div>
+          <label class="toggle" onclick="event.stopPropagation()">
+            <input type="checkbox" id="mealChk">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="cond-field" id="mealField">
+          <div class="field" style="padding-top:6px;">
+            <label>Monthly Meal Card Amount</label>
+            <div class="input-wrap">
+              <span class="input-prefix">&#8377;</span>
+              <input type="number" id="mealCard" placeholder="e.g. 2200" inputmode="numeric" oninput="calc()">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Tax Regime</div>
+        <div class="regime-tabs">
+          <div class="regime-tab active" id="tab-new" onclick="setRegime('new')">New Regime<br><small style="font-size:10px;opacity:0.7">FY 2026-27</small></div>
+          <div class="regime-tab" id="tab-old" onclick="setRegime('old')">Old Regime<br><small style="font-size:10px;opacity:0.7">With deductions</small></div>
+        </div>
+        <div class="regime-note" id="regNote">
+          Std. deduction &#8377;75,000 &middot; 87A rebate &#8377;60,000 &rarr; zero tax up to &#8377;12L taxable (&#8377;12.75L gross)
+        </div>
+        <div id="oldDed" style="display:none;">
+          <div class="field">
+            <label>80C Investments (Annual) <span class="chip">Max &#8377;1.5L</span></label>
+            <div class="input-wrap">
+              <span class="input-prefix">&#8377;</span>
+              <input type="number" id="s80c" placeholder="e.g. 150000" inputmode="numeric" oninput="calc()">
+            </div>
+          </div>
+          <div class="field">
+            <label>80D Health Insurance (Annual) <span class="chip">Max &#8377;25K</span></label>
+            <div class="input-wrap">
+              <span class="input-prefix">&#8377;</span>
+              <input type="number" id="s80d" placeholder="e.g. 25000" inputmode="numeric" oninput="calc()">
+            </div>
+          </div>
+          <div class="field">
+            <label>HRA Exempt (Annual)</label>
+            <div class="input-wrap">
+              <span class="input-prefix">&#8377;</span>
+              <input type="number" id="hra" placeholder="e.g. 100000" inputmode="numeric" oninput="calc()">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: PF + Assumptions -->
+    <div class="col-right">
+      <div class="card">
+        <div class="card-title">PF Contribution</div>
+        <div class="field">
+          <label>Employee PF / Month <span class="chip">Your share</span></label>
+          <div class="input-wrap">
+            <span class="input-prefix">&#8377;</span>
+            <input type="number" id="pfEmp" placeholder="e.g. 1800" inputmode="numeric" oninput="calc()">
+          </div>
+        </div>
+        <div class="pf-box" id="pfBox" style="display:none;">
+          <div class="pf-row">
+            <span style="color:var(--muted)">Employee PF / month</span>
+            <span id="pfEmpD" style="color:var(--accent)"></span>
+          </div>
+          <div class="pf-row">
+            <span style="color:var(--muted)">Employer PF / month</span>
+            <span id="pfErD" style="color:var(--accent2)"></span>
+          </div>
+          <div class="pf-row tot">
+            <span style="color:var(--muted)">Total PF in CTC / month</span>
+            <span id="pfTotD"></span>
+          </div>
+        </div>
+        <p style="font-size:11px;color:var(--dimmed);line-height:1.7;margin-top:10px;">
+          Both shares are part of CTC. Enter your share &mdash; employer matches it. Gross cash = (CTC &minus; Variable &minus; Total PF &minus; Meal) &divide; 12.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Key Assumptions</div>
+        <div class="d-row"><span class="d-name">Profession Tax</span><span class="d-amt r">&#8377;200 / month</span></div>
+        <div class="d-row"><span class="d-name">Meal Exemption</span><span class="d-amt g">Up to &#8377;1L / year</span></div>
+        <div class="d-row"><span class="d-name">Variable Pay</span><span class="d-amt">Excluded from monthly</span></div>
+        <div class="d-row"><span class="d-name">Both PF shares in CTC</span><span class="d-amt b">Removed before gross</span></div>
+        <div class="d-row"><span class="d-name">Surcharge</span><span class="d-amt">If income &gt; &#8377;50L</span></div>
+      </div>
+    </div>
+
+    <!-- RESULTS -->
+    <div class="result-card" id="resultCard">
+      <div class="empty" id="emptyState">
+        <div class="ico">&#128176;</div>
+        Enter your CTC above to see the breakdown
+      </div>
+
+      <div id="resContent" style="display:none;">
+        <div class="res-header">
+          <div class="res-header-title">Monthly Breakdown</div>
+          <div class="hero-wrap">
+            <div class="hero-label">Monthly In-Hand</div>
+            <div class="hero-val" id="heroVal">&#8377;0</div>
+          </div>
+        </div>
+
+        <div class="stats-strip" id="statsStrip"></div>
+
+        <div class="wf-section">
+          <div class="sec-label">Full Monthly Waterfall</div>
+          <div id="wfRows"></div>
+          <div class="total-row">
+            <span>Monthly In-Hand</span>
+            <span id="totInHand" style="color:var(--accent)">&#8377;0</span>
+          </div>
+          <div class="meal-sep-row" id="mealSepRow" style="display:none;">
+            <span>+ Meal Card (separate)</span>
+            <span id="mealSepAmt"></span>
+          </div>
+        </div>
+
+        <div class="ann-section">
+          <div class="sec-label">Annual Summary</div>
+          <div class="ann-grid" id="annGrid"></div>
+        </div>
+
+        <div class="tax-note" id="taxNote"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+let regime = 'new';
+
+// Toggle wiring
+function wireToggle(rowId, chkId, fieldId) {
+  const row = document.getElementById(rowId);
+  const chk = document.getElementById(chkId);
+  const fld = document.getElementById(fieldId);
+  const sync = () => {
+    fld.classList.toggle('show', chk.checked);
+    row.classList.toggle('active', chk.checked);
+    calc();
+  };
+  row.addEventListener('click', e => {
+    if (e.target.closest('label')) return;
+    chk.checked = !chk.checked; sync();
+  });
+  chk.addEventListener('change', sync);
+}
+wireToggle('varRow', 'varChk', 'varField');
+wireToggle('mealRow', 'mealChk', 'mealField');
+
+function setRegime(r) {
+  regime = r;
+  document.getElementById('tab-new').classList.toggle('active', r === 'new');
+  document.getElementById('tab-old').classList.toggle('active', r === 'old');
+  document.getElementById('oldDed').style.display = r === 'old' ? 'block' : 'none';
+  document.getElementById('regNote').textContent = r === 'new'
+    ? 'Std. deduction \u20B975,000 \u00B7 87A rebate \u20B960,000 \u2192 zero tax up to \u20B912L taxable (\u20B912.75L gross)'
+    : 'Std. deduction \u20B950,000 \u00B7 80C up to \u20B91.5L \u00B7 80D up to \u20B925K \u00B7 HRA \u00B7 87A rebate up to \u20B95L taxable';
+  calc();
+}
+
+function fmt(n) { return '\u20B9' + Math.round(n).toLocaleString('en-IN'); }
+function fmtS(n) {
+  if (n >= 1e7) return '\u20B9' + (n/1e7).toFixed(2) + 'Cr';
+  if (n >= 1e5) return '\u20B9' + (n/1e5).toFixed(2) + 'L';
+  return fmt(n);
+}
+
+function calcTax(ti, reg) {
+  let tax = 0;
+  if (reg === 'new') {
+    const s = [[400000,0],[400000,.05],[400000,.10],[400000,.15],[400000,.20],[400000,.25],[Infinity,.30]];
+    let r = ti;
+    for (const [sz, rt] of s) { if (r<=0) break; tax += Math.min(r,sz)*rt; r -= sz; }
+    tax = ti <= 1200000 ? 0 : Math.min(tax, ti - 1200000);
+    if (ti>5e6&&ti<=1e7) tax*=1.10; else if(ti>1e7&&ti<=2e7) tax*=1.15; else if(ti>2e7) tax*=1.25;
+  } else {
+    const s = [[250000,0],[250000,.05],[500000,.20],[Infinity,.30]];
+    let r = ti;
+    for (const [sz, rt] of s) { if (r<=0) break; tax += Math.min(r,sz)*rt; r -= sz; }
+    if (ti<=500000) tax = Math.max(0, tax-12500);
+    if(ti>5e6&&ti<=1e7) tax*=1.10; else if(ti>1e7&&ti<=2e7) tax*=1.15;
+    else if(ti>2e7&&ti<=5e7) tax*=1.25; else if(ti>5e7) tax*=1.37;
+  }
+  return Math.max(0, tax * 1.04);
+}
+
+function calc() {
+  const ctc = parseFloat(document.getElementById('ctc').value) || 0;
+  if (ctc <= 0) {
+    document.getElementById('emptyState').style.display = 'block';
+    document.getElementById('resContent').style.display = 'none';
+    document.getElementById('pfBox').style.display = 'none';
+    document.getElementById('stickyBar').classList.remove('visible');
+    return;
+  }
+
+  const hasVar  = document.getElementById('varChk').checked;
+  const varAnn  = hasVar ? (parseFloat(document.getElementById('variable').value)||0) : 0;
+  const hasMeal = document.getElementById('mealChk').checked;
+  const mealMo  = hasMeal ? (parseFloat(document.getElementById('mealCard').value)||0) : 0;
+  const mealAnn = mealMo * 12;
+
+  const pfE = parseFloat(document.getElementById('pfEmp').value) || 0;
+  const pfR = pfE;
+  const pfTotMo  = pfE + pfR;
+  const pfTotAnn = pfTotMo * 12;
+
+  // PF summary
+  if (pfE > 0) {
+    document.getElementById('pfBox').style.display = 'block';
+    document.getElementById('pfEmpD').textContent = fmt(pfE);
+    document.getElementById('pfErD').textContent  = fmt(pfR);
+    document.getElementById('pfTotD').textContent = fmt(pfTotMo);
+  } else {
+    document.getElementById('pfBox').style.display = 'none';
+  }
+
+  const grossAnn = ctc - varAnn - pfTotAnn - mealAnn;
+  const grossMo  = grossAnn / 12;
+  const mealExAnn = Math.min(mealAnn, 100000);
+
+  let ti = 0;
+  if (regime === 'new') {
+    ti = grossAnn - 75000 - mealExAnn;
+  } else {
+    const std = 50000;
+    const s80c = Math.min(parseFloat(document.getElementById('s80c').value)||0, 150000);
+    const s80d = Math.min(parseFloat(document.getElementById('s80d').value)||0, 25000);
+    const hra  = parseFloat(document.getElementById('hra').value)||0;
+    const tot80c = Math.min(s80c + pfE*12, 150000);
+    ti = grossAnn - std - tot80c - s80d - hra - mealExAnn;
+  }
+  ti = Math.max(0, ti);
+
+  const annTax = calcTax(ti, regime);
+  const moTax  = annTax / 12;
+  const pt = 200;
+  const inHand = grossMo - pfE - moTax - pt - mealMo;
+
+  // Render
+  document.getElementById('emptyState').style.display = 'none';
+  document.getElementById('resContent').style.display = 'block';
+
+  const hv = document.getElementById('heroVal');
+  hv.textContent = fmt(inHand);
+  hv.classList.add('pulse');
+  setTimeout(() => hv.classList.remove('pulse'), 350);
+
+  document.getElementById('stickyVal').textContent = fmt(inHand);
+  document.getElementById('stickyBar').classList.add('visible');
+
+  // Stats strip
+  const stats = [
+    { l:'Gross Monthly', v:fmt(grossMo), c:'neu' },
+    { l:'TDS / Month',   v:fmt(moTax),   c:'neg' },
+    { l:'Employee PF',   v:pfE>0?fmt(pfE):'—', c:pfE>0?'neg':'' },
+    { l:'Profession Tax',v:fmt(pt),       c:'neg' },
+  ];
+  if (hasMeal && mealMo>0) stats.push({ l:'Meal Card', v:fmt(mealMo), c:'neg' });
+  stats.push({ l:'In-Hand', v:fmt(inHand), c:'pos' });
+
+  document.getElementById('statsStrip').innerHTML = stats.map(s=>`
+    <div class="stat">
+      <div class="stat-label">${s.l}</div>
+      <div class="stat-val ${s.c}">${s.v}</div>
+    </div>`).join('');
+
+  // Waterfall
+  const wf = [];
+  wf.push({ n:'CTC (Annual)', a:fmt(ctc), c:'g' });
+  if (hasVar && varAnn>0) wf.push({ n:'&minus; Variable (Annual)', a:`&minus;${fmt(varAnn)}`, c:'r', sub:'excluded from monthly; paid separately' });
+  if (pfTotAnn>0) wf.push({ n:`&minus; Total PF in CTC (${fmt(pfE)} + ${fmt(pfR)} &times; 12)`, a:`&minus;${fmt(pfTotAnn)}`, c:'r', sub:'both employee & employer shares' });
+  if (mealAnn>0) wf.push({ n:'&minus; Meal Card (Annual)', a:`&minus;${fmt(mealAnn)}`, c:'r', sub:'shown separately in pay' });
+  wf.push({ n:'Gross Monthly Cash', a:fmt(grossMo), c:'g' });
+  if (pfE>0) wf.push({ n:'&minus; Employee PF', a:`&minus;${fmt(pfE)}`, c:'r' });
+  wf.push({ n:'&minus; TDS (Annual Tax &divide; 12)', a:`&minus;${fmt(moTax)}`, c:'r' });
+  wf.push({ n:'&minus; Profession Tax', a:`&minus;${fmt(pt)}`, c:'r' });
+  if (hasMeal && mealMo>0) wf.push({ n:'&minus; Meal Card (excluded, separate)', a:`&minus;${fmt(mealMo)}`, c:'r' });
+
+  document.getElementById('wfRows').innerHTML = wf.map(r=>`
+    <div class="wf-row">
+      <span class="wf-name">${r.n}${r.sub?`<small>${r.sub}</small>`:''}</span>
+      <span class="wf-amt ${r.c}">${r.a}</span>
+    </div>`).join('');
+
+  document.getElementById('totInHand').textContent = fmt(inHand);
+  const msr = document.getElementById('mealSepRow');
+  if (hasMeal && mealMo>0) { msr.style.display='flex'; document.getElementById('mealSepAmt').textContent=`${fmt(mealMo)} / month`; }
+  else msr.style.display = 'none';
+
+  // Annual grid
+  const ann = [
+    { l:'Annual CTC',       v:fmtS(ctc),         c:'' },
+    { l:'Annual Take-Home', v:fmtS(inHand*12),    c:'pos' },
+    { l:'Annual TDS',       v:fmtS(annTax),       c:'neg' },
+    { l:'Effective Tax %',  v:(annTax/ctc*100).toFixed(2)+'%', c:'' },
+    { l:'Annual Gross Cash',v:fmtS(grossAnn),     c:'neu' },
+  ];
+  if (pfTotAnn>0) { ann.push({ l:'Total PF (Annual)', v:fmtS(pfTotAnn), c:'neg' }); }
+  if (hasVar && varAnn>0) ann.push({ l:'Variable (Annual)', v:fmtS(varAnn), c:'neu' });
+  if (hasMeal && mealMo>0) { ann.push({ l:'Meal Card (Annual)', v:fmtS(mealAnn), c:'neu' }); ann.push({ l:'Meal Exempt', v:fmtS(mealExAnn), c:'pos' }); }
+
+  document.getElementById('annGrid').innerHTML = ann.map(a=>`
+    <div class="ann-item">
+      <div class="ann-label">${a.l}</div>
+      <div class="ann-val ${a.c}">${a.v}</div>
+    </div>`).join('');
+
+  // Tax note
+  const notes = [];
+  notes.push(regime==='new' ? 'Std. deduction \u20B975,000' : 'Std. deduction \u20B950,000');
+  if (hasMeal && mealExAnn>0) notes.push(`Meal exempt ${fmt(mealExAnn)} p.a.`);
+  if (pfE>0 && regime==='old') notes.push(`PF \u20B9${(pfE*12).toLocaleString('en-IN')} under 80C`);
+  notes.push(`Taxable: ${fmt(ti)} \u00B7 Tax incl. cess: ${fmt(annTax)}`);
+  if (ti>0 && ti<=(regime==='new'?1200000:500000)) notes.push('87A rebate \u2192 zero tax!');
+  document.getElementById('taxNote').innerHTML = '\uD83D\uDCCB ' + notes.join(' \u00B7 ');
+}
+</script>
+</body>
+</html>
