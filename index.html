@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>In-Hand Salary Calculator</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
@@ -49,7 +49,6 @@ body::after {
   pointer-events: none; z-index: 0;
 }
 
-/* Sticky bar */
 .sticky-bar {
   display: none;
   position: fixed;
@@ -73,7 +72,6 @@ body::after {
   -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
 }
 
-/* Container */
 .container {
   max-width: 1100px;
   margin: 0 auto;
@@ -103,7 +101,6 @@ h1 span {
 }
 .subtitle { color: var(--muted); font-size: 12px; margin-top: 8px; line-height: 1.7; }
 
-/* Layout */
 .layout {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -111,7 +108,6 @@ h1 span {
   align-items: start;
 }
 
-/* Cards */
 .card {
   background: var(--card);
   border: 1px solid var(--border);
@@ -133,7 +129,6 @@ h1 span {
   border-radius: 50%; background: var(--accent); flex-shrink: 0;
 }
 
-/* Fields */
 .field { margin-bottom: 14px; }
 
 label {
@@ -149,28 +144,28 @@ label {
   font-size: 13px; color: var(--dimmed); pointer-events: none;
 }
 
-input[type="number"] {
+input[type="number"], select {
   width: 100%;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 10px;
   padding: 13px 13px 13px 28px;
   font-family: 'DM Mono', monospace;
-  font-size: 15px; /* >=16px prevents iOS zoom, 15px fine with maximum-scale=1 */
+  font-size: 16px; /* 16px prevents iOS auto-zoom on focus */
   color: var(--text);
   outline: none;
   transition: border-color 0.2s, box-shadow 0.2s;
   -moz-appearance: textfield;
   -webkit-appearance: none; appearance: none;
 }
+select { padding-left: 13px; cursor: pointer; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'><path fill='%236b6b85' d='M3 4.5L6 7.5L9 4.5Z'/></svg>"); background-repeat: no-repeat; background-position: right 14px center; }
 input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-input[type="number"]:focus {
+input[type="number"]:focus, select:focus {
   border-color: var(--accent2);
   box-shadow: 0 0 0 3px rgba(129,140,248,0.12);
 }
 
-/* Toggles */
 .toggle-field {
   display: flex; align-items: center; justify-content: space-between;
   padding: 12px 14px;
@@ -211,9 +206,8 @@ input[type="number"]:focus {
   overflow: hidden; max-height: 0; opacity: 0;
   transition: max-height 0.3s ease, opacity 0.25s ease;
 }
-.cond-field.show { max-height: 160px; opacity: 1; }
+.cond-field.show { max-height: 800px; opacity: 1; }
 
-/* Regime */
 .regime-tabs { display: flex; gap: 8px; margin-bottom: 14px; }
 .regime-tab {
   flex: 1; padding: 10px 6px;
@@ -236,7 +230,15 @@ input[type="number"]:focus {
   margin-bottom: 14px; line-height: 1.65;
 }
 
-/* Chip */
+.info-box {
+  background: rgba(251,146,60,0.06);
+  border: 1px solid rgba(251,146,60,0.2);
+  border-radius: 8px; padding: 9px 12px;
+  font-size: 11px; color: var(--accent3);
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+
 .chip {
   display: inline-block;
   background: rgba(251,146,60,0.1); border: 1px solid rgba(251,146,60,0.2);
@@ -244,18 +246,16 @@ input[type="number"]:focus {
   border-radius: 100px; margin-left: 5px; vertical-align: middle;
 }
 
-/* Deduction rows */
 .d-row {
   display: flex; justify-content: space-between; align-items: flex-start;
   padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
   font-size: 12px; gap: 8px;
 }
 .d-row:last-child { border-bottom: none; }
-.d-name { color: var(--muted); flex: 1; }
+.d-name { color: var(--muted); flex: 1; min-width: 0; word-break: break-word; }
 .d-amt { font-weight: 500; white-space: nowrap; }
 .d-amt.r { color: var(--warn); } .d-amt.g { color: var(--accent); } .d-amt.b { color: var(--accent2); }
 
-/* PF summary */
 .pf-box {
   background: rgba(110,231,183,0.06);
   border: 1px solid rgba(110,231,183,0.15);
@@ -265,7 +265,16 @@ input[type="number"]:focus {
 .pf-row { display: flex; justify-content: space-between; font-size: 12px; padding: 3px 0; }
 .pf-row.tot { border-top: 1px solid rgba(255,255,255,0.07); margin-top: 5px; padding-top: 7px; font-weight: 600; }
 
-/* Result card */
+.calc-box {
+  background: rgba(129,140,248,0.06);
+  border: 1px solid rgba(129,140,248,0.15);
+  border-radius: 10px; padding: 10px 12px;
+  margin-top: 8px;
+}
+.calc-box-title { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+.calc-row { display: flex; justify-content: space-between; font-size: 11px; padding: 3px 0; color: var(--muted); }
+.calc-row.win { color: var(--accent); font-weight: 600; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.07); margin-top: 4px; }
+
 .result-card {
   background: var(--card); border: 1px solid var(--border);
   border-radius: 14px; overflow: hidden;
@@ -294,7 +303,6 @@ input[type="number"]:focus {
   line-height: 1.1;
 }
 
-/* Stats strip */
 .stats-strip {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -312,7 +320,6 @@ input[type="number"]:focus {
 .stat-val.pos { color: var(--accent); }
 .stat-val.neu { color: var(--accent2); }
 
-/* Waterfall */
 .wf-section { padding: 18px 20px; border-top: 1px solid var(--border); }
 .sec-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px; }
 
@@ -322,7 +329,7 @@ input[type="number"]:focus {
   font-size: 12px; gap: 12px;
 }
 .wf-row:last-child { border-bottom: none; }
-.wf-name { color: var(--muted); flex: 1; line-height: 1.5; }
+.wf-name { color: var(--muted); flex: 1; line-height: 1.5; min-width: 0; word-break: break-word; }
 .wf-name small { display: block; font-size: 10px; color: var(--dimmed); margin-top: 2px; }
 .wf-amt { font-weight: 500; white-space: nowrap; flex-shrink: 0; }
 .wf-amt.g { color: var(--accent); } .wf-amt.r { color: var(--warn); }
@@ -338,7 +345,6 @@ input[type="number"]:focus {
   padding: 8px 0 0; font-size: 13px; color: var(--accent2);
 }
 
-/* Annual */
 .ann-section { padding: 18px 20px; border-top: 1px solid var(--border); }
 .ann-grid {
   display: grid; grid-template-columns: repeat(3, 1fr);
@@ -355,71 +361,138 @@ input[type="number"]:focus {
 .ann-val { font-family: 'Syne', sans-serif; font-size: 0.9rem; font-weight: 700; }
 .ann-val.pos { color: var(--accent); } .ann-val.neg { color: var(--warn); } .ann-val.neu { color: var(--accent2); }
 
-/* Tax note */
 .tax-note { padding: 12px 20px; border-top: 1px solid var(--border); font-size: 11px; color: var(--dimmed); line-height: 1.7; }
 
-/* Empty state */
 .empty { padding: 40px 20px; text-align: center; color: var(--dimmed); font-size: 12px; }
 .empty .ico { font-size: 28px; margin-bottom: 10px; opacity: 0.4; }
 
-/* Animations */
 @keyframes fadeDown { from { opacity:0; transform:translateY(-16px); } to { opacity:1; transform:translateY(0); } }
 @keyframes fadeUp   { from { opacity:0; transform:translateY(14px);  } to { opacity:1; transform:translateY(0); } }
 .pulse { animation: pg 0.35s ease; }
 @keyframes pg { 0%{opacity:1} 50%{opacity:0.4} 100%{opacity:1} }
 
-/* ── MOBILE ── */
+/* Disclaimer */
+.disclaimer {
+  font-size: 10px;
+  color: var(--dimmed);
+  line-height: 1.7;
+  margin-top: 20px;
+  padding: 12px 16px;
+  background: rgba(255,255,255,0.015);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  grid-column: 1 / -1;
+}
+
+/* ── TABLET (641–900px) ── */
+@media (min-width: 641px) and (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; gap: 16px; }
+  .result-card { grid-column: 1; }
+  .disclaimer  { grid-column: 1; }
+  .stats-strip { grid-template-columns: repeat(3, 1fr); }
+  .ann-grid    { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* ── MOBILE (≤640px) ── */
 @media (max-width: 640px) {
+  /* Sticky bar */
   .sticky-bar { display: flex; }
+
+  /* Container */
   .container { padding: 16px 12px 100px; }
   header { margin-bottom: 20px; }
 
+  /* Single column layout, correct stacking order */
   .layout {
     grid-template-columns: 1fr;
     gap: 0;
   }
-  /* order: inputs, pf/assumptions, results */
   .layout > .col-left  { order: 1; }
   .layout > .col-right { order: 2; }
   .result-card         { order: 3; grid-column: 1; margin-top: 14px; }
+  .disclaimer          { order: 4; grid-column: 1; }
 
+  /* Cards */
   .card { border-radius: 12px; padding: 16px; }
   .card + .card { margin-top: 10px; }
   .col-right .card:first-child { margin-top: 10px; }
 
-  /* 2-col stats on mobile */
+  /* Result header — stack vertically */
+  .res-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .hero-wrap { text-align: left; }
+  .hero-val { font-size: clamp(1.6rem, 8vw, 2rem); }
+
+  /* Stats strip — 2 columns */
   .stats-strip { grid-template-columns: repeat(2, 1fr); }
   .stat:nth-child(3n) { border-right: 1px solid var(--border); }
   .stat:nth-child(2n) { border-right: none; }
+  .stat { padding: 11px 12px; }
+  .stat-val { font-size: 0.85rem; }
 
-  /* 2-col annual on mobile */
+  /* Annual grid — 2 columns */
   .ann-grid { grid-template-columns: repeat(2, 1fr); }
   .ann-item:nth-child(3n) { border-right: 1px solid var(--border); }
   .ann-item:nth-child(2n) { border-right: none; }
+  .ann-item { padding: 10px 12px; }
+  .ann-val { font-size: 0.82rem; }
 
-  /* Result header stacks on very small screens */
-  .res-header { flex-direction: column; align-items: flex-start; gap: 8px; }
-  .hero-wrap { text-align: left; }
-
+  /* Waterfall / section padding */
   .wf-section  { padding: 14px 14px; }
   .ann-section { padding: 14px 14px; }
-  .tax-note    { padding: 12px 14px; }
-}
+  .tax-note    { padding: 12px 14px; font-size: 10px; }
 
-/* ── TABLET ── */
-@media (min-width: 641px) and (max-width: 900px) {
-  .layout { grid-template-columns: 1fr; }
-  .result-card { grid-column: 1; }
-  .stats-strip { grid-template-columns: repeat(3, 1fr); }
+  /* Waterfall rows — prevent long sub-labels overflowing */
+  .wf-row { font-size: 11px; gap: 8px; }
+  .wf-name small { font-size: 9px; }
+  .wf-amt { font-size: 11px; }
+
+  /* Total / meal rows */
+  .total-row { font-size: 13px; }
+  .meal-sep-row { font-size: 12px; }
+
+  /* calc-box (HRA breakdown) — prevent overflow */
+  .calc-row { font-size: 10px; flex-wrap: wrap; gap: 2px; }
+  .calc-row span:last-child { text-align: right; }
+
+  /* PF box rows */
+  .pf-row { font-size: 11px; }
+
+  /* d-rows in assumptions card */
+  .d-row { font-size: 11px; }
+  .d-amt { font-size: 11px; white-space: normal; text-align: right; max-width: 55%; }
+
+  /* Toggle field text */
+  .toggle-label { font-size: 13px; }
+  .toggle-sub   { font-size: 10px; }
+
+  /* Chip — no line breaks */
+  .chip { white-space: nowrap; }
+
+  /* Regime tabs */
+  .regime-tab { font-size: 11px; padding: 9px 4px; min-height: 42px; }
+  .regime-note { font-size: 10px; padding: 8px 10px; }
+
+  /* Inputs — 16px already set globally, just adjust padding */
+  input[type="number"], select { padding: 12px 12px 12px 26px; }
+  select { padding-left: 12px; }
+
+  /* April spike section */
+  #aprilSpikeSection { padding: 14px 14px; }
+  #aprilSpikeSection p { font-size: 10px; }
+
+  /* Sec label */
+  .sec-label { font-size: 9px; margin-bottom: 10px; }
+
+  /* Disclaimer */
+  .disclaimer { font-size: 10px; padding: 12px 14px; margin-top: 14px; }
 }
 </style>
 </head>
 <body>
 
-<!-- Sticky in-hand bar (shows on mobile when results are below fold) -->
 <div class="sticky-bar" id="stickyBar">
   <div class="sticky-bar-label">Monthly In-Hand</div>
-  <div class="sticky-bar-value" id="stickyVal">—</div>
+  <div class="sticky-bar-value" id="stickyVal">&mdash;</div>
 </div>
 
 <div class="container">
@@ -431,8 +504,10 @@ input[type="number"]:focus {
 
   <div class="layout">
 
-    <!-- LEFT: CTC Details + Tax Regime -->
+    <!-- LEFT -->
     <div class="col-left">
+
+      <!-- CTC Details -->
       <div class="card">
         <div class="card-title">CTC Details</div>
 
@@ -456,11 +531,25 @@ input[type="number"]:focus {
         </div>
         <div class="cond-field" id="varField">
           <div class="field" style="padding-top:6px;">
-            <label>Variable Amount (Annual)</label>
+            <label>Variable Accrued This FY <span class="chip">Paid next April</span></label>
             <div class="input-wrap">
               <span class="input-prefix">&#8377;</span>
               <input type="number" id="variable" placeholder="e.g. 120000" inputmode="numeric" oninput="calc()">
             </div>
+            <p style="font-size:10px;color:var(--dimmed);margin-top:6px;line-height:1.6;">
+              This is part of your CTC earned for <strong>this year's</strong> performance. You'll receive it next April, so it'll be taxed in FY 2027&ndash;28 (NOT this year).
+            </p>
+          </div>
+
+          <div class="field">
+            <label>Variable Received This April <span class="chip">From last FY</span></label>
+            <div class="input-wrap">
+              <span class="input-prefix">&#8377;</span>
+              <input type="number" id="variableReceived" placeholder="e.g. 100000" inputmode="numeric" oninput="calc()">
+            </div>
+            <p style="font-size:10px;color:var(--dimmed);margin-top:6px;line-height:1.6;">
+              The variable you received in April 2026 (for FY 2025&ndash;26 performance). <strong>This IS taxable this year</strong> since it's taxed on receipt. Leave blank if you didn't receive any.
+            </p>
           </div>
         </div>
 
@@ -485,6 +574,7 @@ input[type="number"]:focus {
         </div>
       </div>
 
+      <!-- Tax Regime -->
       <div class="card">
         <div class="card-title">Tax Regime</div>
         <div class="regime-tabs">
@@ -494,13 +584,17 @@ input[type="number"]:focus {
         <div class="regime-note" id="regNote">
           Std. deduction &#8377;75,000 &middot; 87A rebate &#8377;60,000 &rarr; zero tax up to &#8377;12L taxable (&#8377;12.75L gross)
         </div>
+
         <div id="oldDed" style="display:none;">
           <div class="field">
-            <label>80C Investments (Annual) <span class="chip">Max &#8377;1.5L</span></label>
+            <label>80C Investments (Annual) <span class="chip">Max &#8377;1.5L incl. PF</span></label>
             <div class="input-wrap">
               <span class="input-prefix">&#8377;</span>
-              <input type="number" id="s80c" placeholder="e.g. 150000" inputmode="numeric" oninput="calc()">
+              <input type="number" id="s80c" placeholder="e.g. 50000 (excl. PF)" inputmode="numeric" oninput="calc()">
             </div>
+            <p style="font-size:10px;color:var(--dimmed);margin-top:6px;line-height:1.6;">
+              Enter 80C amount <em>excluding</em> your PF contribution (PF is added automatically).
+            </p>
           </div>
           <div class="field">
             <label>80D Health Insurance (Annual) <span class="chip">Max &#8377;25K</span></label>
@@ -509,19 +603,67 @@ input[type="number"]:focus {
               <input type="number" id="s80d" placeholder="e.g. 25000" inputmode="numeric" oninput="calc()">
             </div>
           </div>
+
+          <!-- HRA sub-card -->
           <div class="field">
-            <label>HRA Exempt (Annual)</label>
-            <div class="input-wrap">
-              <span class="input-prefix">&#8377;</span>
-              <input type="number" id="hra" placeholder="e.g. 100000" inputmode="numeric" oninput="calc()">
+            <label>HRA Exemption Calculator <span class="chip">Optional</span></label>
+            <div class="toggle-field" id="hraRow" style="margin-bottom:8px;">
+              <div>
+                <div class="toggle-label">I pay rent (claim HRA)</div>
+                <div class="toggle-sub">Auto-computes exemption</div>
+              </div>
+              <label class="toggle" onclick="event.stopPropagation()">
+                <input type="checkbox" id="hraChk">
+                <span class="slider"></span>
+              </label>
+            </div>
+            <div class="cond-field" id="hraField">
+              <div class="field">
+                <label>Basic Salary (Annual)</label>
+                <div class="input-wrap">
+                  <span class="input-prefix">&#8377;</span>
+                  <input type="number" id="hraBasic" placeholder="e.g. 480000" inputmode="numeric" oninput="calc()">
+                </div>
+              </div>
+              <div class="field">
+                <label>HRA Received (Annual)</label>
+                <div class="input-wrap">
+                  <span class="input-prefix">&#8377;</span>
+                  <input type="number" id="hraReceived" placeholder="e.g. 240000" inputmode="numeric" oninput="calc()">
+                </div>
+              </div>
+              <div class="field">
+                <label>Rent Paid (Annual)</label>
+                <div class="input-wrap">
+                  <span class="input-prefix">&#8377;</span>
+                  <input type="number" id="hraRent" placeholder="e.g. 300000" inputmode="numeric" oninput="calc()">
+                </div>
+              </div>
+              <div class="field">
+                <label>City Type</label>
+                <select id="hraCity" onchange="calc()">
+                  <option value="metro">Metro (Mumbai, Delhi, Kolkata, Chennai) &mdash; 50%</option>
+                  <option value="nonmetro" selected>Non-Metro &mdash; 40%</option>
+                </select>
+              </div>
+              <div class="calc-box" id="hraCalcBox" style="display:none;">
+                <div class="calc-box-title">HRA Exemption = min of:</div>
+                <div class="calc-row"><span>1. Actual HRA received</span><span id="hra1"></span></div>
+                <div class="calc-row"><span>2. Rent &minus; 10% of Basic</span><span id="hra2"></span></div>
+                <div class="calc-row"><span>3. <span id="hraPctLabel">40%</span> of Basic (<span id="hraCityLabel">non-metro</span>)</span><span id="hra3"></span></div>
+                <div class="calc-row win"><span>&rarr; Exempt Amount</span><span id="hraFinal"></span></div>
+              </div>
             </div>
           </div>
         </div>
       </div>
+
     </div>
 
-    <!-- RIGHT: PF + Assumptions -->
+    <!-- RIGHT -->
     <div class="col-right">
+
+      <!-- PF -->
       <div class="card">
         <div class="card-title">PF Contribution</div>
         <div class="field">
@@ -546,18 +688,75 @@ input[type="number"]:focus {
           </div>
         </div>
         <p style="font-size:11px;color:var(--dimmed);line-height:1.7;margin-top:10px;">
-          Both shares are part of CTC. Enter your share &mdash; employer matches it. Gross cash = (CTC &minus; Variable &minus; Total PF &minus; Meal) &divide; 12.
+          Both shares are part of CTC. Employer matches your contribution. <strong style="color:var(--muted);">Employer PF is tax-exempt</strong> as a perquisite (up to &#8377;7.5L combined PF+NPS+Super). <strong style="color:var(--muted);">Employee PF:</strong> deductible under 80C (old regime) / not deductible (new regime).
         </p>
       </div>
 
+      <!-- Profession Tax -->
+      <div class="card">
+        <div class="card-title">Profession Tax</div>
+        <div class="field">
+          <label>Monthly PT Amount <span class="chip">Varies by state</span></label>
+          <div class="input-wrap">
+            <span class="input-prefix">&#8377;</span>
+            <input type="number" id="pt" placeholder="e.g. 200" value="200" inputmode="numeric" oninput="calc()">
+          </div>
+          <p style="font-size:10px;color:var(--dimmed);margin-top:6px;line-height:1.6;">
+            Common values: Gujarat/KA/MH &#8377;200 &middot; WB &#8377;110-200 &middot; Delhi/Haryana/UP &#8377;0. Feb month often caps at &#8377;300 (KA/MH) &mdash; this uses flat monthly.
+          </p>
+        </div>
+      </div>
+
+      <!-- Other components (ESI, Gratuity) -->
+      <div class="card">
+        <div class="card-title">Other CTC Components</div>
+
+        <div class="toggle-field" id="gratRow">
+          <div>
+            <div class="toggle-label">Gratuity in CTC</div>
+            <div class="toggle-sub">Usually 4.81% of basic, part of CTC</div>
+          </div>
+          <label class="toggle" onclick="event.stopPropagation()">
+            <input type="checkbox" id="gratChk">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="cond-field" id="gratField">
+          <div class="field" style="padding-top:6px;">
+            <label>Annual Gratuity Provision</label>
+            <div class="input-wrap">
+              <span class="input-prefix">&#8377;</span>
+              <input type="number" id="gratuity" placeholder="e.g. 27000" inputmode="numeric" oninput="calc()">
+            </div>
+            <p style="font-size:10px;color:var(--dimmed);margin-top:6px;line-height:1.6;">
+              Accrued in company books, paid only on exit after 5 years. Excluded from take-home.
+            </p>
+          </div>
+        </div>
+
+        <div class="toggle-field" id="esiRow">
+          <div>
+            <div class="toggle-label">ESI Applicable</div>
+            <div class="toggle-sub">Only if gross &le; &#8377;21K/month</div>
+          </div>
+          <label class="toggle" onclick="event.stopPropagation()">
+            <input type="checkbox" id="esiChk">
+            <span class="slider"></span>
+          </label>
+        </div>
+
+      </div>
+
+      <!-- Assumptions -->
       <div class="card">
         <div class="card-title">Key Assumptions</div>
-        <div class="d-row"><span class="d-name">Profession Tax</span><span class="d-amt r">&#8377;200 / month</span></div>
-        <div class="d-row"><span class="d-name">Meal Exemption</span><span class="d-amt g">Up to &#8377;1L / year</span></div>
-        <div class="d-row"><span class="d-name">Variable Pay</span><span class="d-amt">Excluded from monthly</span></div>
-        <div class="d-row"><span class="d-name">Both PF shares in CTC</span><span class="d-amt b">Removed before gross</span></div>
-        <div class="d-row"><span class="d-name">Surcharge</span><span class="d-amt">If income &gt; &#8377;50L</span></div>
+        <div class="d-row"><span class="d-name">Variable pay</span><span class="d-amt">Excluded from monthly; taxed annually</span></div>
+        <div class="d-row"><span class="d-name">Meal card</span><span class="d-amt g">Separate benefit, exempt up to &#8377;1L</span></div>
+        <div class="d-row"><span class="d-name">Both PF shares</span><span class="d-amt b">Part of CTC, removed from cash</span></div>
+        <div class="d-row"><span class="d-name">Surcharge</span><span class="d-amt">With marginal relief at thresholds</span></div>
+        <div class="d-row"><span class="d-name">Cess</span><span class="d-amt r">4% Health &amp; Education</span></div>
       </div>
+
     </div>
 
     <!-- RESULTS -->
@@ -571,7 +770,7 @@ input[type="number"]:focus {
         <div class="res-header">
           <div class="res-header-title">Monthly Breakdown</div>
           <div class="hero-wrap">
-            <div class="hero-label">Monthly In-Hand</div>
+            <div class="hero-label">Steady-State Monthly Cash</div>
             <div class="hero-val" id="heroVal">&#8377;0</div>
           </div>
         </div>
@@ -579,16 +778,32 @@ input[type="number"]:focus {
         <div class="stats-strip" id="statsStrip"></div>
 
         <div class="wf-section">
-          <div class="sec-label">Full Monthly Waterfall</div>
+          <div class="sec-label">Full Monthly Waterfall (11 of 12 months)</div>
           <div id="wfRows"></div>
           <div class="total-row">
-            <span>Monthly In-Hand</span>
+            <span>Steady-State Monthly Cash</span>
             <span id="totInHand" style="color:var(--accent)">&#8377;0</span>
           </div>
           <div class="meal-sep-row" id="mealSepRow" style="display:none;">
-            <span>+ Meal Card (separate)</span>
+            <span>+ Meal Card (loaded separately)</span>
             <span id="mealSepAmt"></span>
           </div>
+          <div class="meal-sep-row" id="totalValRow" style="color:var(--accent);display:none;">
+            <span>= Total Monthly Value Received</span>
+            <span id="totalValAmt"></span>
+          </div>
+        </div>
+
+        <div class="wf-section" id="aprilSpikeSection" style="display:none;border-top:1px solid var(--border);background:rgba(251,146,60,0.04);">
+          <div class="sec-label" style="color:var(--accent3);">April Month (Variable Lump-Sum Received)</div>
+          <div id="aprilRows"></div>
+          <div class="total-row">
+            <span>April In-Hand Cash</span>
+            <span id="aprilInHand" style="color:var(--accent3)">&#8377;0</span>
+          </div>
+          <p style="font-size:11px;color:var(--dimmed);margin-top:10px;line-height:1.6;">
+            April is special &mdash; you receive last FY's variable as a lump sum, and your employer deducts heavy TDS on it that month. The other 11 months are at the steady-state rate above.
+          </p>
         </div>
 
         <div class="ann-section">
@@ -600,19 +815,22 @@ input[type="number"]:focus {
       </div>
     </div>
 
+    <div class="disclaimer">
+      <strong>Disclaimer:</strong> This calculator provides estimates for FY 2026&ndash;27 (AY 2027&ndash;28) based on commonly-applied tax slabs and rules. Actual take-home may vary based on employer-specific CTC structure, state laws, HRA / LTA / NPS / telephone / reimbursement components, marginal relief nuances, and your individual circumstances. TDS deducted monthly may differ from your final annual tax liability. Consult a chartered accountant for personalized advice.
+    </div>
+
   </div>
 </div>
 
 <script>
 let regime = 'new';
 
-// Toggle wiring
 function wireToggle(rowId, chkId, fieldId) {
   const row = document.getElementById(rowId);
   const chk = document.getElementById(chkId);
   const fld = document.getElementById(fieldId);
   const sync = () => {
-    fld.classList.toggle('show', chk.checked);
+    if (fld) fld.classList.toggle('show', chk.checked);
     row.classList.toggle('active', chk.checked);
     calc();
   };
@@ -624,6 +842,9 @@ function wireToggle(rowId, chkId, fieldId) {
 }
 wireToggle('varRow', 'varChk', 'varField');
 wireToggle('mealRow', 'mealChk', 'mealField');
+wireToggle('gratRow', 'gratChk', 'gratField');
+wireToggle('esiRow', 'esiChk', null);
+wireToggle('hraRow', 'hraChk', 'hraField');
 
 function setRegime(r) {
   regime = r;
@@ -638,28 +859,92 @@ function setRegime(r) {
 
 function fmt(n) { return '\u20B9' + Math.round(n).toLocaleString('en-IN'); }
 function fmtS(n) {
-  if (n >= 1e7) return '\u20B9' + (n/1e7).toFixed(2) + 'Cr';
-  if (n >= 1e5) return '\u20B9' + (n/1e5).toFixed(2) + 'L';
+  if (Math.abs(n) >= 1e7) return '\u20B9' + (n/1e7).toFixed(2) + 'Cr';
+  if (Math.abs(n) >= 1e5) return '\u20B9' + (n/1e5).toFixed(2) + 'L';
   return fmt(n);
 }
 
-function calcTax(ti, reg) {
+// HRA exemption = min(actual HRA, rent - 10% basic, 50%/40% basic)
+function calcHRAExemption() {
+  const on = document.getElementById('hraChk').checked;
+  if (!on) return 0;
+  const basic = parseFloat(document.getElementById('hraBasic').value) || 0;
+  const hraRec = parseFloat(document.getElementById('hraReceived').value) || 0;
+  const rent = parseFloat(document.getElementById('hraRent').value) || 0;
+  const city = document.getElementById('hraCity').value;
+  const pct = city === 'metro' ? 0.50 : 0.40;
+
+  if (basic === 0 || hraRec === 0) {
+    document.getElementById('hraCalcBox').style.display = 'none';
+    return 0;
+  }
+
+  const leg1 = hraRec;
+  const leg2 = Math.max(0, rent - 0.10 * basic);
+  const leg3 = pct * basic;
+  const exempt = Math.max(0, Math.min(leg1, leg2, leg3));
+
+  document.getElementById('hraCalcBox').style.display = 'block';
+  document.getElementById('hra1').textContent = fmt(leg1);
+  document.getElementById('hra2').textContent = fmt(leg2);
+  document.getElementById('hra3').textContent = fmt(leg3);
+  document.getElementById('hraPctLabel').textContent = city === 'metro' ? '50%' : '40%';
+  document.getElementById('hraCityLabel').textContent = city === 'metro' ? 'metro' : 'non-metro';
+  document.getElementById('hraFinal').textContent = fmt(exempt);
+  return exempt;
+}
+
+// Surcharge with marginal relief
+function applySurchargeWithRelief(baseTax, ti, reg) {
+  const thresholds = reg === 'new'
+    ? [[5000000, 0.10], [10000000, 0.15], [20000000, 0.25]]
+    : [[5000000, 0.10], [10000000, 0.15], [20000000, 0.25], [50000000, 0.37]];
+
+  let surcharge = 0;
+  let applicableRate = 0;
+  let applicableThreshold = 0;
+
+  for (const [th, rate] of thresholds) {
+    if (ti > th) { applicableRate = rate; applicableThreshold = th; }
+  }
+  if (applicableRate === 0) return baseTax;
+
+  surcharge = baseTax * applicableRate;
+  let totalTaxWithSurcharge = baseTax + surcharge;
+
+  // Marginal relief: tax+surcharge shouldn't exceed tax-at-threshold + (income - threshold)
+  // First compute tax at threshold itself (without surcharge)
+  const taxAtThreshold = calcTaxNoSurcharge(applicableThreshold, reg);
+  const maxAllowable = taxAtThreshold + (ti - applicableThreshold);
+  if (totalTaxWithSurcharge > maxAllowable) totalTaxWithSurcharge = maxAllowable;
+
+  return totalTaxWithSurcharge;
+}
+
+function calcTaxNoSurcharge(ti, reg) {
   let tax = 0;
   if (reg === 'new') {
     const s = [[400000,0],[400000,.05],[400000,.10],[400000,.15],[400000,.20],[400000,.25],[Infinity,.30]];
     let r = ti;
     for (const [sz, rt] of s) { if (r<=0) break; tax += Math.min(r,sz)*rt; r -= sz; }
-    tax = ti <= 1200000 ? 0 : Math.min(tax, ti - 1200000);
-    if (ti>5e6&&ti<=1e7) tax*=1.10; else if(ti>1e7&&ti<=2e7) tax*=1.15; else if(ti>2e7) tax*=1.25;
+    // 87A + marginal relief at 12L
+    if (ti <= 1200000) tax = 0;
+    else tax = Math.min(tax, ti - 1200000);
   } else {
     const s = [[250000,0],[250000,.05],[500000,.20],[Infinity,.30]];
     let r = ti;
     for (const [sz, rt] of s) { if (r<=0) break; tax += Math.min(r,sz)*rt; r -= sz; }
-    if (ti<=500000) tax = Math.max(0, tax-12500);
-    if(ti>5e6&&ti<=1e7) tax*=1.10; else if(ti>1e7&&ti<=2e7) tax*=1.15;
-    else if(ti>2e7&&ti<=5e7) tax*=1.25; else if(ti>5e7) tax*=1.37;
+    if (ti <= 500000) tax = Math.max(0, tax - 12500);
   }
-  return Math.max(0, tax * 1.04);
+  return tax;
+}
+
+function calcTax(ti, reg) {
+  if (ti <= 0) return 0;
+  const base = calcTaxNoSurcharge(ti, reg);
+  const withSurcharge = applySurchargeWithRelief(base, ti, reg);
+  // Health & Education Cess 4%
+  return Math.max(0, withSurcharge * 1.04);
 }
 
 function calc() {
@@ -673,15 +958,22 @@ function calc() {
   }
 
   const hasVar  = document.getElementById('varChk').checked;
-  const varAnn  = hasVar ? (parseFloat(document.getElementById('variable').value)||0) : 0;
+  const varAccruedAnn = hasVar ? (parseFloat(document.getElementById('variable').value)||0) : 0;
+  const varReceivedAnn = hasVar ? (parseFloat(document.getElementById('variableReceived').value)||0) : 0;
   const hasMeal = document.getElementById('mealChk').checked;
   const mealMo  = hasMeal ? (parseFloat(document.getElementById('mealCard').value)||0) : 0;
   const mealAnn = mealMo * 12;
+
+  const hasGrat = document.getElementById('gratChk').checked;
+  const gratAnn = hasGrat ? (parseFloat(document.getElementById('gratuity').value)||0) : 0;
+  const hasEsi  = document.getElementById('esiChk').checked;
 
   const pfE = parseFloat(document.getElementById('pfEmp').value) || 0;
   const pfR = pfE;
   const pfTotMo  = pfE + pfR;
   const pfTotAnn = pfTotMo * 12;
+
+  const pt = parseFloat(document.getElementById('pt').value) || 0;
 
   // PF summary
   if (pfE > 0) {
@@ -693,27 +985,79 @@ function calc() {
     document.getElementById('pfBox').style.display = 'none';
   }
 
-  const grossAnn = ctc - varAnn - pfTotAnn - mealAnn;
-  const grossMo  = grossAnn / 12;
+  // ── Gross Monthly Cash Salary ──
+  // CTC = Fixed cash + Variable (accrued this FY, paid next April) + Total PF + Meal + Gratuity
+  // Gross monthly cash = what shows up in payslip as gross (before statutory deductions)
+  // NOTE: varReceivedAnn is NOT in this year's CTC — it's last year's variable paid now
+  const grossCashAnn = ctc - varAccruedAnn - pfTotAnn - mealAnn - gratAnn;
+  const grossCashMo  = grossCashAnn / 12;
+
+  // ── Meal card ──
   const mealExAnn = Math.min(mealAnn, 100000);
 
+  // ── ESI (employee 0.75%, employer 3.25% of gross wages, if gross ≤ ₹21K) ──
+  let esiEmpMo = 0, esiErMo = 0;
+  if (hasEsi && grossCashMo <= 21000) {
+    esiEmpMo = Math.round(grossCashMo * 0.0075);
+    esiErMo  = Math.round(grossCashMo * 0.0325);
+  }
+
+  // ── Taxable Income ──
+  // Variable received this April (last FY's bonus) IS taxable this year (taxed on receipt)
+  // Variable accrued this FY (paid next April) is NOT taxable this year
+  // Employer PF contribution is exempt as perquisite (up to ₹7.5L combined PF+NPS+Super)
+  // Employee PF: New regime — not deductible (taxable salary). Old regime — 80C deductible.
+  // Meal card: ₹1L/year exempt. Excess is taxable.
+  // Gratuity is exempt when paid, accrual not taxed
+  const employeePFAnn = pfE * 12; // employee share = same as input × 12
+  const mealExcessAnn = Math.max(0, mealAnn - 100000); // taxable portion of meal
+
   let ti = 0;
+  let hraExempt = 0;
+
   if (regime === 'new') {
-    ti = grossAnn - 75000 - mealExAnn;
+    // grossCashAnn already excludes BOTH PF shares and FULL meal annual.
+    // Add back: employee PF (taxable salary, not deductible in new regime) + meal excess (>₹1L)
+    // Then add: variable received this April
+    // Then subtract: standard deduction (75K)
+    // (Employer PF is correctly excluded since it's perquisite-exempt up to ₹7.5L)
+    ti = grossCashAnn + employeePFAnn + mealExcessAnn + varReceivedAnn - 75000;
   } else {
     const std = 50000;
     const s80c = Math.min(parseFloat(document.getElementById('s80c').value)||0, 150000);
     const s80d = Math.min(parseFloat(document.getElementById('s80d').value)||0, 25000);
-    const hra  = parseFloat(document.getElementById('hra').value)||0;
-    const tot80c = Math.min(s80c + pfE*12, 150000);
-    ti = grossAnn - std - tot80c - s80d - hra - mealExAnn;
+    hraExempt = calcHRAExemption();
+    // In old regime, employee PF is taxable salary BUT also qualifies under 80C
+    // So add it back to gross, then deduct under 80C (capped 1.5L total)
+    const tot80c = Math.min(s80c + employeePFAnn, 150000);
+    ti = grossCashAnn + employeePFAnn + mealExcessAnn + varReceivedAnn - std - tot80c - s80d - hraExempt;
   }
   ti = Math.max(0, ti);
 
   const annTax = calcTax(ti, regime);
-  const moTax  = annTax / 12;
-  const pt = 200;
-  const inHand = grossMo - pfE - moTax - pt - mealMo;
+
+  // ── Separate steady-state tax from April lump-sum tax ──
+  // Tax attributable to the April variable (marginal calc):
+  // tax(income WITH variable) − tax(income WITHOUT variable)
+  let tiWithoutAprilVar = ti - varReceivedAnn;
+  tiWithoutAprilVar = Math.max(0, tiWithoutAprilVar);
+  const annTaxWithoutAprilVar = calcTax(tiWithoutAprilVar, regime);
+  const aprilLumpSumTax = Math.max(0, annTax - annTaxWithoutAprilVar);
+
+  // Steady-state monthly TDS = tax on regular salary only ÷ 12
+  const moTaxSteady = annTaxWithoutAprilVar / 12;
+
+  // April month TDS = steady-state + lump-sum tax on variable (one-time spike)
+  const moTaxApril = moTaxSteady + aprilLumpSumTax;
+
+  // ── In-Hand (Steady-state monthly, what you get in 11 of 12 months) ──
+  const inHand = grossCashMo - pfE - moTaxSteady - pt - esiEmpMo;
+
+  // ── April month in-hand (the month variable is received) ──
+  const inHandApril = grossCashMo + varReceivedAnn - pfE - moTaxApril - pt - esiEmpMo;
+
+  // Total monthly value received (steady-state cash + meal card value)
+  const totalMonthlyValue = inHand + mealMo;
 
   // Render
   document.getElementById('emptyState').style.display = 'none';
@@ -729,13 +1073,14 @@ function calc() {
 
   // Stats strip
   const stats = [
-    { l:'Gross Monthly', v:fmt(grossMo), c:'neu' },
-    { l:'TDS / Month',   v:fmt(moTax),   c:'neg' },
-    { l:'Employee PF',   v:pfE>0?fmt(pfE):'—', c:pfE>0?'neg':'' },
-    { l:'Profession Tax',v:fmt(pt),       c:'neg' },
+    { l:'Gross Monthly Cash', v:fmt(grossCashMo), c:'neu' },
+    { l:'TDS / Month',        v:fmt(moTaxSteady), c:'neg' },
+    { l:'Employee PF',        v:pfE>0?fmt(pfE):'—', c:pfE>0?'neg':'' },
   ];
-  if (hasMeal && mealMo>0) stats.push({ l:'Meal Card', v:fmt(mealMo), c:'neg' });
-  stats.push({ l:'In-Hand', v:fmt(inHand), c:'pos' });
+  stats.push({ l:'Profession Tax', v:fmt(pt), c:pt>0?'neg':'' });
+  if (hasEsi && esiEmpMo>0) stats.push({ l:'ESI (Employee)', v:fmt(esiEmpMo), c:'neg' });
+  stats.push({ l:'In-Hand (Cash)', v:fmt(inHand), c:'pos' });
+  if (hasMeal && mealMo>0) stats.push({ l:'Meal Card', v:fmt(mealMo), c:'neu' });
 
   document.getElementById('statsStrip').innerHTML = stats.map(s=>`
     <div class="stat">
@@ -746,14 +1091,20 @@ function calc() {
   // Waterfall
   const wf = [];
   wf.push({ n:'CTC (Annual)', a:fmt(ctc), c:'g' });
-  if (hasVar && varAnn>0) wf.push({ n:'&minus; Variable (Annual)', a:`&minus;${fmt(varAnn)}`, c:'r', sub:'excluded from monthly; paid separately' });
+  if (hasVar && varAccruedAnn>0) wf.push({ n:'&minus; Variable Accrued This FY', a:`&minus;${fmt(varAccruedAnn)}`, c:'r', sub:'part of CTC; will be received next April and taxed then' });
   if (pfTotAnn>0) wf.push({ n:`&minus; Total PF in CTC (${fmt(pfE)} + ${fmt(pfR)} &times; 12)`, a:`&minus;${fmt(pfTotAnn)}`, c:'r', sub:'both employee & employer shares' });
-  if (mealAnn>0) wf.push({ n:'&minus; Meal Card (Annual)', a:`&minus;${fmt(mealAnn)}`, c:'r', sub:'shown separately in pay' });
-  wf.push({ n:'Gross Monthly Cash', a:fmt(grossMo), c:'g' });
+  if (hasMeal && mealAnn>0) wf.push({ n:'&minus; Meal Card (Annual)', a:`&minus;${fmt(mealAnn)}`, c:'r', sub:'loaded to meal card; shown separately below' });
+  if (hasGrat && gratAnn>0) wf.push({ n:'&minus; Gratuity (Annual Provision)', a:`&minus;${fmt(gratAnn)}`, c:'r', sub:'accrual only; paid at exit after 5 years' });
+  wf.push({ n:'Gross Monthly Cash Salary', a:fmt(grossCashMo), c:'g', sub:'what your payslip shows as gross' });
   if (pfE>0) wf.push({ n:'&minus; Employee PF', a:`&minus;${fmt(pfE)}`, c:'r' });
-  wf.push({ n:'&minus; TDS (Annual Tax &divide; 12)', a:`&minus;${fmt(moTax)}`, c:'r' });
-  wf.push({ n:'&minus; Profession Tax', a:`&minus;${fmt(pt)}`, c:'r' });
-  if (hasMeal && mealMo>0) wf.push({ n:'&minus; Meal Card (excluded, separate)', a:`&minus;${fmt(mealMo)}`, c:'r' });
+
+  const tdsSubtext = hasVar && varReceivedAnn > 0
+    ? 'on regular salary only (April variable taxed separately as lump sum)'
+    : 'based on annual tax \u00F7 12';
+  wf.push({ n:'&minus; Monthly TDS (Steady-State)', a:`&minus;${fmt(moTaxSteady)}`, c:'r', sub: tdsSubtext });
+
+  if (pt > 0) wf.push({ n:'&minus; Profession Tax', a:`&minus;${fmt(pt)}`, c:'r' });
+  if (hasEsi && esiEmpMo>0) wf.push({ n:'&minus; ESI (Employee 0.75%)', a:`&minus;${fmt(esiEmpMo)}`, c:'r' });
 
   document.getElementById('wfRows').innerHTML = wf.map(r=>`
     <div class="wf-row">
@@ -762,21 +1113,68 @@ function calc() {
     </div>`).join('');
 
   document.getElementById('totInHand').textContent = fmt(inHand);
-  const msr = document.getElementById('mealSepRow');
-  if (hasMeal && mealMo>0) { msr.style.display='flex'; document.getElementById('mealSepAmt').textContent=`${fmt(mealMo)} / month`; }
-  else msr.style.display = 'none';
 
-  // Annual grid
+  const msr = document.getElementById('mealSepRow');
+  const tvr = document.getElementById('totalValRow');
+  if (hasMeal && mealMo>0) {
+    msr.style.display='flex';
+    document.getElementById('mealSepAmt').textContent=`+${fmt(mealMo)}`;
+    tvr.style.display='flex';
+    document.getElementById('totalValAmt').textContent=fmt(totalMonthlyValue);
+  } else {
+    msr.style.display = 'none';
+    tvr.style.display = 'none';
+  }
+
+  // April spike section
+  const aprilSection = document.getElementById('aprilSpikeSection');
+  if (hasVar && varReceivedAnn > 0) {
+    aprilSection.style.display = 'block';
+    const aprilRows = [
+      { n:'Gross April Cash', a:fmt(grossCashMo + varReceivedAnn), c:'g', sub:`regular ${fmt(grossCashMo)} + variable ${fmt(varReceivedAnn)}` },
+      { n:'&minus; Employee PF', a:`&minus;${fmt(pfE)}`, c:'r' },
+      { n:'&minus; April TDS (Spike)', a:`&minus;${fmt(moTaxApril)}`, c:'r', sub:`steady-state ${fmt(moTaxSteady)} + lump-sum tax ${fmt(aprilLumpSumTax)}` },
+      { n:'&minus; Profession Tax', a:`&minus;${fmt(pt)}`, c:'r' },
+    ];
+    if (hasEsi && esiEmpMo>0) aprilRows.push({ n:'&minus; ESI', a:`&minus;${fmt(esiEmpMo)}`, c:'r' });
+
+    document.getElementById('aprilRows').innerHTML = aprilRows.map(r=>`
+      <div class="wf-row">
+        <span class="wf-name">${r.n}${r.sub?`<small>${r.sub}</small>`:''}</span>
+        <span class="wf-amt ${r.c}">${r.a}</span>
+      </div>`).join('');
+    document.getElementById('aprilInHand').textContent = fmt(inHandApril);
+  } else {
+    aprilSection.style.display = 'none';
+  }
+
+  // Annual summary
+  // Annual cash in-hand = 11 steady months + 1 April month
+  const annualCashInHand = (hasVar && varReceivedAnn > 0)
+    ? (inHand * 11 + inHandApril)
+    : (inHand * 12);
+
+  // Total annual value received THIS year = cash in-hand + meal + total PF + gratuity
+  // (varReceivedAnn is already in annualCashInHand via the April month)
+  const totalAnnualValue = annualCashInHand + mealAnn + pfTotAnn + gratAnn;
+  const effTaxBase = ctc + varReceivedAnn;
   const ann = [
-    { l:'Annual CTC',       v:fmtS(ctc),         c:'' },
-    { l:'Annual Take-Home', v:fmtS(inHand*12),    c:'pos' },
-    { l:'Annual TDS',       v:fmtS(annTax),       c:'neg' },
-    { l:'Effective Tax %',  v:(annTax/ctc*100).toFixed(2)+'%', c:'' },
-    { l:'Annual Gross Cash',v:fmtS(grossAnn),     c:'neu' },
+    { l:'Annual CTC',              v:fmtS(ctc), c:'' },
+    { l:'Annual Cash In-Hand',     v:fmtS(annualCashInHand), c:'pos' },
+    { l:'Annual TDS',              v:fmtS(annTax), c:'neg' },
+    { l:'Effective Tax %',         v:(annTax/effTaxBase*100).toFixed(2)+'%', c:'' },
+    { l:'Annual Gross Cash',       v:fmtS(grossCashAnn), c:'neu' },
+    { l:'Total Received This Yr',  v:fmtS(totalAnnualValue), c:'pos' },
   ];
-  if (pfTotAnn>0) { ann.push({ l:'Total PF (Annual)', v:fmtS(pfTotAnn), c:'neg' }); }
-  if (hasVar && varAnn>0) ann.push({ l:'Variable (Annual)', v:fmtS(varAnn), c:'neu' });
-  if (hasMeal && mealMo>0) { ann.push({ l:'Meal Card (Annual)', v:fmtS(mealAnn), c:'neu' }); ann.push({ l:'Meal Exempt', v:fmtS(mealExAnn), c:'pos' }); }
+  if (pfTotAnn>0) ann.push({ l:'Total PF (Annual)', v:fmtS(pfTotAnn), c:'neg' });
+  if (hasVar && varAccruedAnn>0) ann.push({ l:'Variable Accrued (next Apr)', v:fmtS(varAccruedAnn), c:'neu' });
+  if (hasVar && varReceivedAnn>0) ann.push({ l:'Variable Received (this Apr)', v:fmtS(varReceivedAnn), c:'pos' });
+  if (hasMeal && mealMo>0) {
+    ann.push({ l:'Meal Card (Annual)', v:fmtS(mealAnn), c:'neu' });
+    ann.push({ l:'Meal Tax Exempt',    v:fmtS(mealExAnn), c:'pos' });
+  }
+  if (hasGrat && gratAnn>0) ann.push({ l:'Gratuity (Annual)', v:fmtS(gratAnn), c:'neu' });
+  if (regime === 'old' && hraExempt > 0) ann.push({ l:'HRA Exempt', v:fmtS(hraExempt), c:'pos' });
 
   document.getElementById('annGrid').innerHTML = ann.map(a=>`
     <div class="ann-item">
@@ -786,11 +1184,15 @@ function calc() {
 
   // Tax note
   const notes = [];
-  notes.push(regime==='new' ? 'Std. deduction \u20B975,000' : 'Std. deduction \u20B950,000');
-  if (hasMeal && mealExAnn>0) notes.push(`Meal exempt ${fmt(mealExAnn)} p.a.`);
+  notes.push(regime==='new' ? 'Std. ded. \u20B975K' : 'Std. ded. \u20B950K');
+  if (hasMeal && mealExAnn>0) notes.push(`Meal exempt ${fmt(mealExAnn)}`);
   if (pfE>0 && regime==='old') notes.push(`PF \u20B9${(pfE*12).toLocaleString('en-IN')} under 80C`);
-  notes.push(`Taxable: ${fmt(ti)} \u00B7 Tax incl. cess: ${fmt(annTax)}`);
+  if (regime==='old' && hraExempt>0) notes.push(`HRA exempt ${fmt(hraExempt)}`);
+  if (hasVar && varReceivedAnn>0) notes.push(`April variable ${fmt(varReceivedAnn)} taxed this FY`);
+  if (hasVar && varAccruedAnn>0) notes.push(`Accrued variable ${fmt(varAccruedAnn)} will be taxed next FY`);
+  notes.push(`Taxable: ${fmt(ti)} \u00B7 Tax incl. 4% cess: ${fmt(annTax)}`);
   if (ti>0 && ti<=(regime==='new'?1200000:500000)) notes.push('87A rebate \u2192 zero tax!');
+  if (ti > 5000000) notes.push('Surcharge applied (with marginal relief)');
   document.getElementById('taxNote').innerHTML = '\uD83D\uDCCB ' + notes.join(' \u00B7 ');
 }
 </script>
